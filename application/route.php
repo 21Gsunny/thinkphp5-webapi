@@ -16,5 +16,6 @@
 \think\Route::get('healthCheck','tijian/Home/appJktjList');
 \think\Route::get('checkupData','tijian/Home/appJktjData');
 \think\Route::get('fllowList','tijian/Fllow/getFllowUpList');
+\think\Route::get('fllowUp','tijian/Fllow/getFllowUp');
 \think\Route::post('addcheckinfo','tijianche/Post/addInfo');
 

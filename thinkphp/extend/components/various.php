@@ -47,4 +47,9 @@ class various
     {
         return ['阴性','阳性'];
     }
+
+    public static function fllowType()
+    {
+        return ['门诊','家庭','电话'];
+    }
 }

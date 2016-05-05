@@ -33,10 +33,7 @@ class Fllow extends Common
     {
         if($this->_check() === true)
         {
-            $zjhm = I('get.id');
-            $userinfo = new ServerUserInfo();
-            $userinfo->zjhm = $zjhm;
-            $data['userInfo'] = $userinfo->getUserInfo();
+            $data['userInfo'] = $this->userInfo();
             $tnbsf = new TblTnbsf();
             $gxysf = new TblGxysf();
             $jsjbsf = new TblJsjbsf();
@@ -47,7 +44,7 @@ class Fllow extends Common
             $i = 0;
             foreach($tnbsf->getList() as $k=>$v)
             {
-                $data['followUpList'][$i]['followUpId'] = 't'.$v['tnbsfid'];
+                $data['followUpList'][$i]['followUpId'] = 't-'.$v['tnbsfid'];
                 $data['followUpList'][$i]['followUpDate'] = date("Y-m-d",$v['sfrq']);
                 $data['followUpList'][$i]['followUpMed'] = _keyValue($v['sffs'],various::fllowType());
                 $data['followUpList'][$i]['followUpType'] = '糖尿病';
@@ -56,7 +53,7 @@ class Fllow extends Common
             }
             foreach($gxysf->getList() as $k=>$v)
             {
-                $data['followUpList'][$i]['followUpId'] = 'g'.$v['gxysfid'];
+                $data['followUpList'][$i]['followUpId'] = 'g-'.$v['gxysfid'];
                 $data['followUpList'][$i]['followUpDate'] = date("Y-m-d",$v['sfrq']);
                 $data['followUpList'][$i]['followUpMed'] = _keyValue($v['sffs'],various::fllowType());
                 $data['followUpList'][$i]['followUpType'] = '高血压';
@@ -65,7 +62,7 @@ class Fllow extends Common
             }
             foreach($jsjbsf->getList() as $k=>$v)
             {
-                $data['followUpList'][$i]['followUpId'] = 'j'.$v['jsjbsfid'];
+                $data['followUpList'][$i]['followUpId'] = 'j-'.$v['jsjbsfid'];
                 $data['followUpList'][$i]['followUpDate'] = date("Y-m-d",$v['sfrq']);
                 $data['followUpList'][$i]['followUpMed'] = _keyValue($v['sffs'],various::fllowType());
                 $data['followUpList'][$i]['followUpType'] = '精神疾病';
@@ -86,7 +83,113 @@ class Fllow extends Common
 
     public function getFllowUp()
     {
+        if($this->_check())
+        {
+            $this->_checkFllowID();
+            $fllowid = explode('-',I('get.followUpId'));
+            switch($fllowid[0])
+            {
+                case 'g':
+                    $this->gxySf($fllowid[1]);
+                    break;
+                case 't':
+                    $this->tnbSf($fllowid[1]);
+                    break;
+                case 'j':
+                     $this->jsjbSf($fllowid[1]);
+                    break;
+                default:
+                    jsonReturn::$code = 404404;
+                    jsonReturn::$status = 'fail';
+                    jsonReturn::$data = '请求ID错误';
+                    jsonReturn::returnInfo();
+                    break;
+            }
+        }
+        else
+        {
+            return $this->_check();
+        }
+    }
+    public function gxySf($id)
+    {
+        $gxy = new TblGxysf();
+        $gxy->gxysfID = $id;
+        $data = [];
+        if($gxy->getData())
+        {
+            $data['userInfo'] = $this->userInfo();
+            $data['testingData'] = $gxy->getData();
+            jsonReturn::$code = 305;
+            jsonReturn::$data = $data;
+        }
+        else
+        {
+            jsonReturn::$code = 305;
+            jsonReturn::$status = 'fail';
+            jsonReturn::$data = '没有随访记录';
 
+        }
+        jsonReturn::returnInfo();
     }
 
+    public function tnbSf($id)
+    {
+        $tnb = new TblTnbsf();
+        $tnb->tnbsfID = $id;
+        $data = [];
+        if($tnb->getData())
+        {
+            $data['userInfo'] = $this->userInfo();
+            $data['testingData'] = $tnb->getData();
+            jsonReturn::$data = $data;
+        }
+        else
+        {
+            jsonReturn::$status = 'fail';
+            jsonReturn::$data = '没有随访记录';
+
+        }
+        jsonReturn::$code = 306;
+        jsonReturn::returnInfo();
+    }
+
+    public function jsjbSf($id)
+    {
+        $jsjb = new TblJsjbsf();
+        $jsjb->jsjbsfID = $id;
+        $data = [];
+        if($jsjb->getData())
+        {
+            $data['userInfo'] = $this->userInfo();
+            $data['testingData'] = $jsjb->getData();
+            jsonReturn::$data = $data;
+        }
+        else
+        {
+            jsonReturn::$status = 'fail';
+            jsonReturn::$data = '没有随访记录';
+
+        }
+        jsonReturn::$code = 307;
+        jsonReturn::returnInfo();
+    }
+    public function userInfo()
+    {
+        $zjhm = I('get.id');
+        $userinfo = new ServerUserInfo();
+        $userinfo->zjhm = $zjhm;
+        return $userinfo->getUserInfo();
+    }
+    protected function _checkFllowID()
+    {
+        if(!I('get.followUpId'))
+        {
+            jsonReturn::$code = 110;
+            jsonReturn::$status = 'error';
+            jsonReturn::$data = '随访记录ID错误或者为空';
+            jsonReturn::returnInfo();
+            die();
+        }
+    }
 }

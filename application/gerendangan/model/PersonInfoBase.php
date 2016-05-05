@@ -160,9 +160,16 @@ class PersonInfoBase extends Model
     }
     public function xuexing($k)
     {
-        $arr = ['A型','B型','O型','AB型','不详'];
-        $k = (int)$k-1;
-        return $arr[$k];
+        if($k)
+        {
+            $arr = ['A型','B型','O型','AB型','不详'];
+            $k = (int)$k-1;
+            return $arr[$k];
+        }
+        else
+        {
+            return '未填写';
+        }
     }
 
     private function checkList($k,$p)

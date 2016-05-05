@@ -27,7 +27,6 @@ class ServerUserInfo
         $data['phoneNum'] = $personinfo['brdh'] ? $personinfo['brdh'] : '未填写';
         $data['hemotype'] = $person->xuexing($personinfo['xuexing']);
         $data['age'] = various::getAge($cardinfo['chushengriqi']);
-
         return $data;
     }
 }

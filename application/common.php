@@ -32,7 +32,10 @@ function changeDate($time)
         return '未填写';
     }
 }
-
+function extendDate($time)
+{
+    return ($time && date("Y-m-d",$time) != '1970-01-01') ? date("Y-m-d",$time) : '未填写';
+}
 // 验证身份证号码合法性
 function checkIdCard($idcard)
 {
