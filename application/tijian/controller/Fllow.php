@@ -33,6 +33,7 @@ class Fllow extends Common
     {
         if($this->_check() === true)
         {
+            $zjhm = I('get.id');
             $data['userInfo'] = $this->userInfo();
             $tnbsf = new TblTnbsf();
             $gxysf = new TblGxysf();

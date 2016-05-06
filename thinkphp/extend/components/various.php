@@ -32,9 +32,10 @@ class various
         return $age;
     }
 
-    public static function is_has()
+    public static function is_has($has = false)
     {
-        return ['无','有'];
+        $has = $has ? '有:'.$has : '有';
+        return ['无',$has];
     }
 
     public static function is_false($yc=false)
@@ -51,5 +52,10 @@ class various
     public static function fllowType()
     {
         return ['门诊','家庭','电话'];
+    }
+
+    public static function state()
+    {
+        return ['良好','一般','较差'];
     }
 }
