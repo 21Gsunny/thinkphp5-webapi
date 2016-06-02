@@ -23,4 +23,5 @@ return [
         //限制允许读取日志的client_id
         'allow_client_ids' => [],
     ],*/
+    'db_config2' => 'mysql://root:skycloud@192.168.8.249:3306/contec_ecg#utf8',
 ];

@@ -9,6 +9,7 @@
  * +-------------------------------------
  */
 namespace components;
+use think\Response;
 class jsonReturn
 {
     public static $status = 'success';
@@ -35,6 +36,9 @@ class jsonReturn
             'code'=>self::$code,
             'data'=>self::$data,
         ]];
-        \think\Response::send(self::$result,'json');
+        Response::data(self::$result);
+        Response::type('json');
+        Response::send();
+        exit();
     }
 }

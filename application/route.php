@@ -19,3 +19,5 @@
 \think\Route::get('fllowUp','tijian/Fllow/getFllowUp');
 \think\Route::post('addcheckinfo','tijianche/Post/addInfo');
 
+\think\Route::get('deviceCheckList','contec/Contec/contecList');
+\think\Route::get('deviceCheckInfo','contec/Contec/contecInfo');

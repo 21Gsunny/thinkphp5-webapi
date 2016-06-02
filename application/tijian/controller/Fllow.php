@@ -34,6 +34,8 @@ class Fllow extends Common
         if($this->_check() === true)
         {
             $zjhm = I('get.id');
+            $page = I('get.page') ? I('get.page') : 1;
+            $num = I('get.num');
             $data['userInfo'] = $this->userInfo();
             $tnbsf = new TblTnbsf();
             $gxysf = new TblGxysf();
@@ -70,9 +72,22 @@ class Fllow extends Common
                 $data['followUpList'][$i]['followUpDocName'] = $docter->getName($v['sfys']);
                 $i++;
             }
+            $result ;
+            if($i > $num && !empty($num))
+            {
+                $page = (int)$page-1;
+                for($page;$page < $num;$page++)
+                {
+                    $result[] = $data['followUpList'][$page];
+                }
+            }
+            else
+            {
+                $result = $data;
+            }
             jsonReturn::$code = 304;
             jsonReturn::$status = 'success';
-            jsonReturn::$data = $data;
+            jsonReturn::$data = $result;
             jsonReturn::returnInfo();
         }
         else
@@ -84,7 +99,7 @@ class Fllow extends Common
 
     public function getFllowUp()
     {
-        if($this->_check())
+        if($this->_check() === true)
         {
             $this->_checkFllowID();
             $fllowid = explode('-',I('get.followUpId'));

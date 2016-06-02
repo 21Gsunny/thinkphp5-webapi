@@ -14,6 +14,10 @@ use app\gerendangan\model\Cardinfo;
 use components\jsonReturn;
 class Common extends Controller{
 
+    public function _initialize()
+    {
+
+    }
     /**
      * 空方法用于404
      * @return 错误提示
@@ -50,11 +54,10 @@ class Common extends Controller{
      * 检测Token值是否为空和是否存在
      * @return false
      */
-    private function checkToken()
+    protected function checkToken()
     {
         if(!I('get.tokenid')) return false;
         if(D('Token')->getTokenID() === false) return false;
-
     }
 
     /**
