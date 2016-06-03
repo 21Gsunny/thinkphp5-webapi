@@ -27,6 +27,10 @@ class Common extends Controller{
        return $this->errorInfo();
     }
 
+    public function getID()
+    {
+        return I('get.id');
+    }
     /**
      * 必须访问逻辑处理，检测token和提交的证件号码
      * @return 提示信息|array|bool

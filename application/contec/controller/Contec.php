@@ -10,8 +10,10 @@
  */
 namespace app\contec\controller;
 use app\common\controller\Common;
+use app\contec\model\vitalSigns;
 use components\jsonReturn;
 use app\contec\model\ContecEcg;
+use app\gerendangan\controller\ServerUserInfo;
 class Contec extends Common
 {
     public function _initialize()
@@ -39,40 +41,43 @@ class Contec extends Common
         $contec = new ContecEcg();
         $contec->userid = I('get.id');
         $userinfo = $contec->getUserInfo();
-        $data['userinfo'] = $userinfo;
-        $contec->type = 'select';
-        $time = $this->getData();
-        $info = $contec->getBloodPressure($time);
-        $i=0;
-        $heigth = (int)substr($data['userinfo']['height'],0,-2);
-        if(!is_array($info))
-        {
-            $data['checkUpInfo'] = '无体检记录';
+        if(is_array($userinfo) && !empty($userinfo)) {
+            $data['userinfo'] = $userinfo;
+            $contec->type = 'select';
+            $time = $this->getData();
+            $info = $contec->getBloodPressure($time);
+            $i = 0;
+            $heigth = (int)substr($data['userinfo']['height'], 0, -2);
+            if (!is_array($info)) {
+                $data['checkUpInfo'] = '无体检记录';
+            } else {
+                $contec->type = 'find';
+                foreach ($info as $k => $v) {
+                    $data['checkUpInfo'][$i]['date'] = $v['date'];
+                    $data['checkUpInfo'][$i]['bloodpressure'] = $v['systolicpressure'] . '/' . $v['diastolicpressure'] . '(mmHg)';
+                    $data['checkUpInfo'][$i]['averagepressure'] = $v['averagepressure'] . '(mmHg)';
+                    $data['checkUpInfo'][$i]['limosisbg'] = $contec->getBloodsugar($v['date']);
+                    $data['checkUpInfo'][$i]['heartrate'] = $contec->getHeartrate($v['date']);
+                    $data['checkUpInfo'][$i]['respiration'] = $contec->getRespiration($v['date']);
+                    $data['checkUpInfo'][$i]['pulserate'] = $contec->getPulseRate($v['date']);
+                    $data['checkUpInfo'][$i]['spo2'] = $contec->getSpo2($v['date']);
+                    $data['checkUpInfo'][$i]['temperature'] = $contec->getTemperature($v['date']);
+                    $data['checkUpInfo'][$i]['weigth'] = $contec->getWeigth($v['date']);
+                    $weigth = (int)substr($data['checkUpInfo'][$i]['weigth'], 0, -2);
+                    if ($heigth && $weigth) {
+                        $data['checkUpInfo'][$i]['BMI'] = round($weigth / $heigth / $heigth * 10000, 1) . 'Kg/m^2';
+                    }
+                    $i++;
+                }
+            }
+            jsonReturn::$data = $data;
         }
         else
         {
-            $contec->type = 'find';
-            foreach($info as $k=>$v)
-            {
-                $data['checkUpInfo'][$i]['date'] = $v['date'];
-                $data['checkUpInfo'][$i]['bloodpressure'] = $v['systolicpressure'].'/'.$v['diastolicpressure'].'(mmHg)';
-                $data['checkUpInfo'][$i]['averagepressure'] = $v['averagepressure'].'(mmHg)';
-                $data['checkUpInfo'][$i]['limosisbg'] = $contec->getBloodsugar($v['date']);
-                $data['checkUpInfo'][$i]['heartrate'] = $contec->getHeartrate($v['date']);
-                $data['checkUpInfo'][$i]['respiration'] = $contec->getRespiration($v['date']);
-                $data['checkUpInfo'][$i]['pulserate'] = $contec->getPulseRate($v['date']);
-                $data['checkUpInfo'][$i]['spo2'] = $contec->getSpo2($v['date']);
-                $data['checkUpInfo'][$i]['temperature'] = $contec->getTemperature($v['date']);
-                $data['checkUpInfo'][$i]['weigth'] = $contec->getWeigth($v['date']);
-                $weigth = (int)substr($data['checkUpInfo'][$i]['weigth'],0,-2);
-                if($heigth && $weigth)
-                {
-                    $data['checkUpInfo'][$i]['BMI'] = round($weigth/$heigth/$heigth*10000,1).'Kg/m^2';
-                }
-                $i++;
-            }
+            jsonReturn::$status = 'error';
+            jsonReturn::$data = '未建档号码!!';
+            jsonReturn::$code = 101;
         }
-        jsonReturn::$data = $data;
         jsonReturn::returnInfo();
     }
 
@@ -134,6 +139,41 @@ class Contec extends Common
         }
         jsonReturn::$code = 1;
         jsonReturn::$data = $data;
+        jsonReturn::returnInfo();
+    }
+
+
+    public function appContecList()
+    {
+        $useinfo = new ServerUserInfo();
+        $kt = new vitalSigns();
+        $kt->userid = $this->getID();
+        $useinfo->zjhm = $this->getID();
+        $data['userinfo'] =$useinfo->getUserInfo();
+        $heigth = $kt->user_info_search();
+        if(!empty($heigth))
+        {
+            $kt->type = 'find';
+            $time = $this->getData();
+            $info = $kt->getBloodPressure($time);
+            if($info===false)
+            {
+                jsonReturn::$data = '该号码本月无体检记录！！';
+                jsonReturn::$status = 'fail';
+            }
+            else
+            {
+                jsonReturn::$status = 'success';
+                jsonReturn::$data= $data;
+            }
+
+        }
+        else
+        {
+           jsonReturn::$data = '该号码未使用过生命体征仪体检！！';
+            jsonReturn::$status = 'fail';
+        }
+        jsonReturn::$code = 101;
         jsonReturn::returnInfo();
     }
 

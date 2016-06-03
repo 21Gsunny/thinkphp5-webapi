@@ -21,3 +21,5 @@
 
 \think\Route::get('deviceCheckList','contec/Contec/contecList');
 \think\Route::get('deviceCheckInfo','contec/Contec/contecInfo');
+
+\think\Route::get('vitalSignsList','contec/Contec/appContecList');
